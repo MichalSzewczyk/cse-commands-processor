@@ -2,6 +2,7 @@ package com.mszewczyk.cp.controller.routes;
 
 import com.mszewczyk.cp.model.Command;
 import com.mszewczyk.cp.service.commands.CommandProducer;
+import lombok.extern.slf4j.Slf4j;
 import spark.Request;
 import spark.Response;
 
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
+@Slf4j
 public class RequestHandler implements CommandProducer {
     private static final String USER_PATH_VARIABLE = ":user";
     private static final String GROUP_PATH_VARIABLE = ":group";
@@ -17,26 +19,31 @@ public class RequestHandler implements CommandProducer {
 
     public RequestHandler() {
         commandConsumers = new LinkedList<>();
+        log.info("Initialized request handler.");
     }
 
     @Override
     public void subscribe(Consumer<Command> consumer) {
         commandConsumers.add(consumer);
+        log.info("Command consumer subscribed. [numberOfConsumers={}]", commandConsumers.size());
     }
 
     public String handleAddToGroup(Request request, Response response) {
+        log.info("Processing request to add to group. [request={}]", request);
         processRequest(request, response, Command.Operation.ADD);
         return "Added.";
     }
 
     public String removeFromGroup(Request request, Response response) {
+        log.info("Processing request to remove from group. [request={}]", request);
         processRequest(request, response, Command.Operation.REMOVE);
         return "Removed.";
     }
 
     private void processRequest(Request request, Response response, Command.Operation add) {
-        Command addCommand = extractCommand(request, add);
-        populateToAllConsumers(addCommand);
+        Command command = extractCommand(request, add);
+        log.info("Processing command. [command={}]", command);
+        populateToAllConsumers(command);
         response.status(ACCEPTED_STATUS_CODE);
     }
 
