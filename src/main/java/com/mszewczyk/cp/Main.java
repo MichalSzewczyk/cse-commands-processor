@@ -19,9 +19,11 @@ public class Main {
                 handler::handleAddToGroup, handler::removeFromGroup);
         source.initialize();
 
+        // TODO: Add implementation of event store
         AppLogicRoot appLogicRoot = AppLogicRoot
                 .builder()
-                .commandProducer(handler)
+                .commandSource(handler)
+                .eventStore(null)
                 .build();
 
         appLogicRoot.wire();

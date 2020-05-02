@@ -1,7 +1,7 @@
 package com.mszewczyk.cp.controller.routes;
 
 import com.mszewczyk.cp.model.Command;
-import com.mszewczyk.cp.service.commands.CommandProducer;
+import com.mszewczyk.cp.service.commands.CommandSource;
 import lombok.extern.slf4j.Slf4j;
 import spark.Request;
 import spark.Response;
@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.function.Consumer;
 
 @Slf4j
-public class RequestHandler implements CommandProducer {
+public class RequestHandler implements CommandSource {
     private static final String USER_PATH_VARIABLE = ":user";
     private static final String GROUP_PATH_VARIABLE = ":group";
     private static final int ACCEPTED_STATUS_CODE = 202;
