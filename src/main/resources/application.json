@@ -1,0 +1,10 @@
+{
+  "cp": {
+    "http": {
+      "paths": {
+        "addToGroup": "/membership/:group/:user",
+        "removeFromGroup": "/membership/:group/:user"
+      }
+    }
+  }
+}

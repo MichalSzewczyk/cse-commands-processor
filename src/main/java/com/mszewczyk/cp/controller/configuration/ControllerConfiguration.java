@@ -1,12 +1,8 @@
 package com.mszewczyk.cp.controller.configuration;
 
-public class ControllerConfiguration {
+public interface ControllerConfiguration {
 
-    public String addToGroupPath() {
-        return null;
-    }
+    String addToGroupPath();
 
-    public String removeFromGroupPath() {
-        return null;
-    }
+    String removeFromGroupPath();
 }
