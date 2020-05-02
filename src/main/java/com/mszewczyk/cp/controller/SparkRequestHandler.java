@@ -1,5 +1,6 @@
-package com.mszewczyk.cp.controller.routes;
+package com.mszewczyk.cp.controller;
 
+import com.mszewczyk.cp.controller.configuration.ControllerConfiguration;
 import com.mszewczyk.cp.model.Command;
 import com.mszewczyk.cp.service.commands.CommandSource;
 import lombok.extern.slf4j.Slf4j;
@@ -10,31 +11,47 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
+import static spark.Spark.delete;
+import static spark.Spark.put;
+
 @Slf4j
-public class RequestHandler implements CommandSource {
+public class SparkRequestHandler implements CommandSource {
     private static final String USER_PATH_VARIABLE = ":user";
     private static final String GROUP_PATH_VARIABLE = ":group";
     private static final int ACCEPTED_STATUS_CODE = 202;
     private final Collection<Consumer<Command>> commandConsumers;
+    private final ControllerConfiguration configuration;
 
-    public RequestHandler() {
+    public SparkRequestHandler(ControllerConfiguration configuration) {
+        this.configuration = configuration;
         commandConsumers = new LinkedList<>();
         log.info("Initialized request handler.");
     }
 
     @Override
-    public void subscribe(Consumer<Command> consumer) {
-        commandConsumers.add(consumer);
-        log.info("Command consumer subscribed. [numberOfConsumers={}]", commandConsumers.size());
+    public void start() {
+        log.info("Started initialization of command controller.");
+        configureRoutes();
+        log.info("Configuration of command controller finished.");
     }
 
-    public String handleAddToGroup(Request request, Response response) {
+    @Override
+    public void subscribe(Consumer<Command> consumer) {
+        commandConsumers.add(consumer);
+    }
+
+    private void configureRoutes() {
+        put(configuration.addToGroupPath(), this::handleAddToGroup);
+        delete(configuration.removeFromGroupPath(), this::removeFromGroup);
+    }
+
+    private String handleAddToGroup(Request request, Response response) {
         log.info("Processing request to add to group. [request={}]", request);
         processRequest(request, response, Command.Operation.ADD);
         return "Added.";
     }
 
-    public String removeFromGroup(Request request, Response response) {
+    private String removeFromGroup(Request request, Response response) {
         log.info("Processing request to remove from group. [request={}]", request);
         processRequest(request, response, Command.Operation.REMOVE);
         return "Removed.";

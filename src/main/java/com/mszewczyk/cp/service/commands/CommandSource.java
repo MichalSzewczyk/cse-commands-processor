@@ -6,4 +6,6 @@ import java.util.function.Consumer;
 
 public interface CommandSource {
     void subscribe(Consumer<Command> consumer);
+
+    void start();
 }
