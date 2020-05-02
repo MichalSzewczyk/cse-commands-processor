@@ -1,4 +1,4 @@
-package com.mszewczyk.cp.controller.configuration;
+package com.mszewczyk.cp.controller;
 
 public interface ControllerConfiguration {
 

@@ -1,6 +1,6 @@
 package com.mszewczyk.cp.configuration.consul;
 
-import com.mszewczyk.cp.controller.configuration.ControllerConfiguration;
+import com.mszewczyk.cp.controller.ControllerConfiguration;
 
 //TODO: Implement consul based configuration source.
 public class ConsulConfiguration implements ControllerConfiguration {

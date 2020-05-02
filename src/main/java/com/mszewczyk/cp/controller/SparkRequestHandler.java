@@ -1,6 +1,5 @@
 package com.mszewczyk.cp.controller;
 
-import com.mszewczyk.cp.controller.configuration.ControllerConfiguration;
 import com.mszewczyk.cp.model.Command;
 import com.mszewczyk.cp.service.commands.CommandSource;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.mszewczyk.cp.configuration.yaml;
 
-import com.mszewczyk.cp.controller.configuration.ControllerConfiguration;
+import com.mszewczyk.cp.controller.ControllerConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;

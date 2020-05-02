@@ -2,7 +2,7 @@ package com.mszewczyk.cp;
 
 import com.mszewczyk.cp.configuration.yaml.JacksonMapDeserializer;
 import com.mszewczyk.cp.configuration.yaml.JsonConfiguration;
-import com.mszewczyk.cp.controller.configuration.ControllerConfiguration;
+import com.mszewczyk.cp.controller.ControllerConfiguration;
 import com.mszewczyk.cp.controller.SparkRequestHandler;
 import com.mszewczyk.cp.persistance.EventsStorage;
 import com.mszewczyk.cp.service.AppLogicRoot;
