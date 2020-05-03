@@ -79,7 +79,7 @@ public class CassandraConnector implements DatabaseConnector<Command> {
         session.close();
     }
 
-    private CqlSession buildCluster(String dbUrl, String dataCenter, int port) {
+    private CqlSession buildCluster(String dataCenter, String dbUrl, int port) {
         CqlSessionBuilder builder = CqlSession.builder();
         builder.withLocalDatacenter(dataCenter);
         builder.addContactPoint(new InetSocketAddress(dbUrl, port));
