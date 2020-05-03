@@ -9,15 +9,15 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-
-// TODO: Implement events storage
 @Slf4j
 public class EventsStorage implements EventStore, CommandSource {
     private final boolean isRecovery;
+    private final DatabaseConnector<Command> databaseConnector;
     private final Collection<Consumer<Command>> consumers;
 
-    public EventsStorage(boolean isRecovery) {
+    public EventsStorage(boolean isRecovery, DatabaseConnector<Command> databaseConnector) {
         this.isRecovery = isRecovery;
+        this.databaseConnector = databaseConnector;
         consumers = new LinkedList<>();
     }
 
@@ -28,7 +28,7 @@ public class EventsStorage implements EventStore, CommandSource {
 
     @Override
     public void start() {
-
+        databaseConnector.getAll().forEach(command -> consumers.forEach(consumer -> consumer.accept(command)));
     }
 
     @Override
@@ -36,11 +36,7 @@ public class EventsStorage implements EventStore, CommandSource {
         if (isRecovery) {
             log.info("System is in recovery state. Ignoring command.");
         } else {
-            storeCommand(command);
+            databaseConnector.store(command);
         }
-    }
-
-    private void storeCommand(Command command) {
-
     }
 }

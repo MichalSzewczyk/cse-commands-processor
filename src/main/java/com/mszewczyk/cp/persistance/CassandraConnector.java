@@ -26,10 +26,10 @@ public class CassandraConnector implements DatabaseConnector<Command> {
     private final String keySpace;
     private final SimpleStatement insertCommandStatement;
 
-    public CassandraConnector(String dataCenter, String dbUrl, int port, String keySpace) {
-        this.keySpace = keySpace;
+    public CassandraConnector(DatabaseConfiguration configuration) {
+        this.keySpace = configuration.keySpace();
         insertCommandStatement = buildInsertCommandStatement();
-        session = buildCluster(dataCenter, dbUrl, port);
+        session = buildCluster(configuration.dataCenter(), configuration.dbUrl(), configuration.port());
     }
 
     @Override

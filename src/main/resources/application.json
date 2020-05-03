@@ -5,6 +5,12 @@
         "addToGroup": "/membership/:group/:user",
         "removeFromGroup": "/membership/:group/:user"
       }
+    },
+    "persistence": {
+      "datacenter": "datacenter1",
+      "dbUrl": "192.168.254.129",
+      "port": "9042",
+      "keyspace": "anyKeySpace"
     }
   }
 }
