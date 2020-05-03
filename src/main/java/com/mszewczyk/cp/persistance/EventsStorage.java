@@ -29,6 +29,11 @@ public class EventsStorage implements EventStore, CommandSource {
     @Override
     public void start() {
         databaseConnector.getAll().forEach(command -> consumers.forEach(consumer -> consumer.accept(command)));
+        try {
+            databaseConnector.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to close database connector.", e);
+        }
     }
 
     @Override
