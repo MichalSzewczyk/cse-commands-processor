@@ -14,20 +14,22 @@ import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.List;
 
 public class CassandraConnector implements DatabaseConnector<Command> {
     public static final String EVENTS_TABLE = "events_table";
-    public static final String EVENT_ID = "event_id";
-    public static final String USER_ID = "user_id";
     public static final String GROUP_ID = "group_id";
+    public static final String USER_ID = "user_id";
+    public static final String EVENT_ID = "event_id";
+    public static final String OPERATION = "operation";
     private final CqlSession session;
     private final String keySpace;
     private final SimpleStatement insertCommandStatement;
 
-    public CassandraConnector(String dbUrl, int port, String keySpace) {
+    public CassandraConnector(String dataCenter, String dbUrl, int port, String keySpace) {
         this.keySpace = keySpace;
         insertCommandStatement = buildInsertCommandStatement();
-        session = buildCluster(dbUrl, port);
+        session = buildCluster(dataCenter, dbUrl, port);
     }
 
     @Override
@@ -38,8 +40,17 @@ public class CassandraConnector implements DatabaseConnector<Command> {
 
         session.execute(createKeyspace.build());
         session.execute("USE " + CqlIdentifier.fromCql(keySpace));
-        CreateTable createTable = buildCreateTableStatement();
-        session.execute(createTable.build());
+        if (!isEventsTableAlreadyCreated()) {
+            CreateTable createTable = buildCreateTableStatement();
+            session.execute(createTable.build());
+        }
+    }
+
+    private boolean isEventsTableAlreadyCreated() {
+        Select selectTableNames = QueryBuilder.selectFrom("system_schema", "tables").all();
+        ResultSet resultSet = session.execute(selectTableNames.build());
+        List<String> tableNames = resultSet.map(row -> row.getString("table_name")).all();
+        return tableNames.contains(EVENTS_TABLE);
     }
 
     @Override
@@ -55,9 +66,9 @@ public class CassandraConnector implements DatabaseConnector<Command> {
         PreparedStatement preparedStatement = session.prepare(insertCommandStatement);
 
         BoundStatement statement = preparedStatement.bind()
-                .setLong(0, System.currentTimeMillis())
+                .setString(0, value.getGroup())
                 .setString(1, value.getUser())
-                .setString(2, value.getGroup())
+                .setLong(2, System.currentTimeMillis())
                 .setString(3, value.getOperation().toString());
 
         session.execute(statement);
@@ -68,30 +79,33 @@ public class CassandraConnector implements DatabaseConnector<Command> {
         session.close();
     }
 
-    private CqlSession buildCluster(String dbUrl, int port) {
+    private CqlSession buildCluster(String dbUrl, String dataCenter, int port) {
         CqlSessionBuilder builder = CqlSession.builder();
+        builder.withLocalDatacenter(dataCenter);
         builder.addContactPoint(new InetSocketAddress(dbUrl, port));
         return builder.build();
     }
 
     private SimpleStatement buildInsertCommandStatement() {
         return QueryBuilder.insertInto(EVENTS_TABLE)
-                .value(EVENT_ID, QueryBuilder.bindMarker())
+                .value(GROUP_ID, QueryBuilder.bindMarker())
                 .value(USER_ID, QueryBuilder.bindMarker())
-                .value(GROUP_ID, QueryBuilder.bindMarker()).build();
+                .value(EVENT_ID, QueryBuilder.bindMarker())
+                .value(OPERATION, QueryBuilder.bindMarker()).build();
     }
 
     private CreateTable buildCreateTableStatement() {
         return SchemaBuilder.createTable(EVENTS_TABLE)
-                .withPartitionKey(EVENT_ID, DataTypes.TIMESTAMP)
+                .withPartitionKey(GROUP_ID, DataTypes.TEXT)
                 .withColumn(USER_ID, DataTypes.TEXT)
-                .withColumn(GROUP_ID, DataTypes.TEXT);
+                .withColumn(EVENT_ID, DataTypes.BIGINT)
+                .withColumn(OPERATION, DataTypes.TEXT);
     }
 
     private Command getCommandFromRow(Row row) {
-        String userId = row.getString(1);
-        String groupId = row.getString(2);
-        String operation = row.getString(3);
+        String groupId = row.getString(GROUP_ID);
+        String userId = row.getString(USER_ID);
+        String operation = row.getString(OPERATION);
         return new Command(Command.Operation.valueOf(operation), userId, groupId);
     }
 }
