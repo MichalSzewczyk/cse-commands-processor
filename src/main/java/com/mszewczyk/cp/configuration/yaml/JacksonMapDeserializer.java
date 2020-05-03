@@ -3,7 +3,6 @@ package com.mszewczyk.cp.configuration.yaml;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -19,7 +18,7 @@ public class JacksonMapDeserializer implements BiFunction<String, Path, Map<Stri
     private final TypeReference<HashMap<String, String>> typeRef;
 
     public JacksonMapDeserializer() {
-        mapper = new ObjectMapper(new YAMLFactory());
+        mapper = new ObjectMapper();
         typeRef = new TypeReference<>() {
         };
     }
