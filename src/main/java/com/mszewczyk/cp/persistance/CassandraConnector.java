@@ -66,10 +66,10 @@ public class CassandraConnector implements DatabaseConnector<Command> {
         PreparedStatement preparedStatement = session.prepare(insertCommandStatement);
 
         BoundStatement statement = preparedStatement.bind()
-                .setString(0, value.getGroup())
-                .setString(1, value.getUser())
-                .setLong(2, System.currentTimeMillis())
-                .setString(3, value.getOperation().toString());
+                .setString(GROUP_ID, value.getGroup())
+                .setString(USER_ID, value.getUser())
+                .setLong(EVENT_ID, System.currentTimeMillis())
+                .setString(OPERATION, value.getOperation().toString());
 
         session.execute(statement);
     }
@@ -96,9 +96,9 @@ public class CassandraConnector implements DatabaseConnector<Command> {
 
     private CreateTable buildCreateTableStatement() {
         return SchemaBuilder.createTable(EVENTS_TABLE)
-                .withPartitionKey(GROUP_ID, DataTypes.TEXT)
+                .withPartitionKey(EVENT_ID, DataTypes.BIGINT)
                 .withColumn(USER_ID, DataTypes.TEXT)
-                .withColumn(EVENT_ID, DataTypes.BIGINT)
+                .withColumn(GROUP_ID, DataTypes.TEXT)
                 .withColumn(OPERATION, DataTypes.TEXT);
     }
 
