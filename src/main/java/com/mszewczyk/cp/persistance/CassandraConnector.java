@@ -46,13 +46,6 @@ public class CassandraConnector implements DatabaseConnector<Command> {
         }
     }
 
-    private boolean isEventsTableAlreadyCreated() {
-        Select selectTableNames = QueryBuilder.selectFrom("system_schema", "tables").all();
-        ResultSet resultSet = session.execute(selectTableNames.build());
-        List<String> tableNames = resultSet.map(row -> row.getString("table_name")).all();
-        return tableNames.contains(EVENTS_TABLE);
-    }
-
     @Override
     public Collection<Command> getAll() {
         Select select = QueryBuilder.selectFrom(EVENTS_TABLE).all();
@@ -77,6 +70,13 @@ public class CassandraConnector implements DatabaseConnector<Command> {
     @Override
     public void close() {
         session.close();
+    }
+
+    private boolean isEventsTableAlreadyCreated() {
+        Select selectTableNames = QueryBuilder.selectFrom("system_schema", "tables").all();
+        ResultSet resultSet = session.execute(selectTableNames.build());
+        List<String> tableNames = resultSet.map(row -> row.getString("table_name")).all();
+        return tableNames.contains(EVENTS_TABLE);
     }
 
     private CqlSession buildCluster(String dataCenter, String dbUrl, int port) {
