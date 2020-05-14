@@ -1,5 +1,7 @@
 package com.mszewczyk.cp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mszewczyk.cp.configuration.ApplicationConfiguration;
 import com.mszewczyk.cp.configuration.yaml.JacksonMapDeserializer;
 import com.mszewczyk.cp.configuration.yaml.JsonConfiguration;
@@ -25,7 +27,7 @@ public class Main {
             isRecovery = Boolean.parseBoolean(args[0]);
         }
 
-
+        ObjectMapper mapper = new ObjectMapper();
         DatabaseConnector<Command> databaseConnector = new CassandraConnector(configuration);
         EventsStorage eventStore = new EventsStorage(isRecovery, databaseConnector);
         CommandSource commandSource;
@@ -39,12 +41,20 @@ public class Main {
                 .builder()
                 .commandSource(commandSource)
                 .eventStore(eventStore)
-                .producer(new KafkaEventsProducer())
+                .producer(new KafkaEventsProducer<>(value -> serializeValue(mapper, value), configuration))
                 .build();
 
         appLogicRoot.wire();
 
         databaseConnector.initializeDataStructure();
         commandSource.start();
+    }
+
+    private static String serializeValue(ObjectMapper mapper, Command value) {
+        try {
+            return mapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Serialization failed.", e);
+        }
     }
 }

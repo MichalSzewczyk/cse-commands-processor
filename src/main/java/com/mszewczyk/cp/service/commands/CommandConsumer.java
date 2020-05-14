@@ -9,9 +9,9 @@ import java.util.function.Consumer;
 @Slf4j
 public class CommandConsumer implements Consumer<Command> {
     private final EventStore eventStore;
-    private final CommandProducer producer;
+    private final CommandProducer<Command> producer;
 
-    public CommandConsumer(EventStore eventStore, CommandProducer producer) {
+    public CommandConsumer(EventStore eventStore, CommandProducer<Command> producer) {
         this.eventStore = eventStore;
         this.producer = producer;
     }

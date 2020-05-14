@@ -11,18 +11,25 @@ import java.util.function.BiFunction;
 public class JsonConfiguration implements ApplicationConfiguration {
     private static final String PATHS_PREFIX = "/cp/http/paths";
     private static final String DATABASE_PREFIX = "/cp/persistence";
+    private static final String KAFKA_PREFIX = "/cp/kafka";
     private static final String ADD_TO_GROUP_PATH_KEY = "addToGroup";
     private static final String REMOVE_FROM_GROUP_PATH_KEY = "removeFromGroup";
     private static final String DATA_CENTER_KEY = "datacenter";
     private static final String DB_URL_KEY = "dbUrl";
     private static final String PORT_KEY = "port";
     private static final String KEYSPACE_KEY = "keyspace";
+    private static final String PRODUCER_ID_KEY = "producerId";
+    private static final String TOPIC_KEY = "topic";
+    private static final String BROKERS_KEY = "brokers";
     private final String addToGroupPath;
     private final String removeFromGroupPath;
     private final String dataCenter;
     private final String dbUrl;
     private final int port;
     private final String keyspace;
+    private final String producerId;
+    private final String topic;
+    private final String brokers;
 
     public JsonConfiguration(Path configFilePath, BiFunction<String, Path, Map<String, String>> mapLoader) {
         Map<String, String> pathsConfigurationMap = mapLoader.apply(PATHS_PREFIX, configFilePath);
@@ -34,6 +41,11 @@ public class JsonConfiguration implements ApplicationConfiguration {
         dbUrl = persistenceConfigurationMap.get(DB_URL_KEY);
         port = Integer.parseInt(persistenceConfigurationMap.get(PORT_KEY));
         keyspace = persistenceConfigurationMap.get(KEYSPACE_KEY);
+
+        Map<String, String> kafkaConfigurationMap = mapLoader.apply(KAFKA_PREFIX, configFilePath);
+        producerId = kafkaConfigurationMap.get(PRODUCER_ID_KEY);
+        topic = kafkaConfigurationMap.get(TOPIC_KEY);
+        brokers = kafkaConfigurationMap.get(BROKERS_KEY);
         log.info("Initialized configuration. [pathsConfigurationMap={}] [persistenceConfigurationMap={}]", pathsConfigurationMap, persistenceConfigurationMap);
     }
 
@@ -65,5 +77,20 @@ public class JsonConfiguration implements ApplicationConfiguration {
     @Override
     public String keySpace() {
         return keyspace;
+    }
+
+    @Override
+    public String brokers() {
+        return brokers;
+    }
+
+    @Override
+    public String producerId() {
+        return producerId;
+    }
+
+    @Override
+    public String topic() {
+        return topic;
     }
 }

@@ -13,11 +13,11 @@ import java.util.function.Consumer;
 public class AppLogicRoot {
     private final CommandSource commandSource;
     private final EventStore eventStore;
-    private final CommandProducer producer;
+    private final CommandProducer<Command> producer;
 
     private AppLogicRoot(CommandSource commandSource,
                          EventStore eventStore,
-                         CommandProducer producer) {
+                         CommandProducer<Command> producer) {
         this.commandSource = commandSource;
         this.eventStore = eventStore;
         this.producer = producer;

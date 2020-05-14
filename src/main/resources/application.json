@@ -8,9 +8,14 @@
     },
     "persistence": {
       "datacenter": "datacenter1",
-      "dbUrl": "192.168.254.129",
+      "dbUrl": "192.168.254.146",
       "port": "9042",
       "keyspace": "anyKeySpace"
+    },
+    "kafka": {
+      "producerId": "commandsProcessor",
+      "topic": "commands",
+      "brokers": "192.168.254.146:9092"
     }
   }
 }
